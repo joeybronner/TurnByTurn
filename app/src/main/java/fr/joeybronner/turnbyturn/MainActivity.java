@@ -37,6 +37,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.Display;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 
 import org.apache.http.HttpEntity;
@@ -55,7 +56,6 @@ import java.util.Map;
 
 import fr.joeybronner.turnbyturn.utils.GMapV2Direction;
 import fr.joeybronner.turnbyturn.utils.GetDirectionsAsyncTask;
-
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -79,19 +79,29 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         bNavigation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    JSONObject jsonObject = getLocationInfo("91 avenue de Flandre, 75019 Paris");
-                    endLng = ((JSONArray)jsonObject.get("results")).getJSONObject(0)
-                            .getJSONObject("geometry").getJSONObject("location")
-                            .getDouble("lng");
+                class Sess extends AsyncTask<Void, Integer, Long> {
+                    protected Long doInBackground(Void... arg0) {
+                        try {
+                            EditText etDestination = (EditText) findViewById(R.id.etDestination);
+                            String address = etDestination.getText().toString();
+                            JSONObject jsonObject = getLocationInfo(address);
+                            endLat = ((JSONArray) jsonObject.get("results")).getJSONObject(0)
+                                    .getJSONObject("geometry").getJSONObject("location")
+                                    .getDouble("lat");
+                            endLng = ((JSONArray) jsonObject.get("results")).getJSONObject(0)
+                                    .getJSONObject("geometry").getJSONObject("location")
+                                    .getDouble("lng");
+                        } catch (JSONException e) {
+                            // Nothing.
+                        }
+                        return null;
+                    }
 
-                    endLat = ((JSONArray)jsonObject.get("results")).getJSONObject(0)
-                            .getJSONObject("geometry").getJSONObject("location")
-                            .getDouble("lat");
-                    findDirections(startLat, startLng, endLat, endLng, GMapV2Direction.MODE_DRIVING);
-                } catch (JSONException e) {
-
+                    protected void onPostExecute(Long result) {
+                        findDirections(startLat, startLng, endLat, endLng, GMapV2Direction.MODE_DRIVING);
+                    }
                 }
+                new Sess().execute();
             }
         });
     }
@@ -110,17 +120,17 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             startLng = location.getLongitude();
             mMap.setMyLocationEnabled(true);
             LatLng loc = new LatLng(startLat, startLng);
-            /*if (mMap != null) {
+            if (mMap != null) {
                 if (once == 1) {
                     mMap.clear();
-                    mMap.addMarker(new MarkerOptions()
+                    /*mMap.addMarker(new MarkerOptions()
                             .position(loc)
                             .title("Joey")
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.moto)));
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.moto)));*/
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
                     once = 0;
                 }
-            }*/
+            }
         }
     };
 
@@ -135,7 +145,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
         newPolyline = mMap.addPolyline(rectLine);
 
-        latlngBounds = createLatLngBoundsObject(new LatLng(startLat, startLng), PARIS);
+        latlngBounds = createLatLngBoundsObject(new LatLng(startLat, startLng), new LatLng(endLat, endLng));
         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latlngBounds,
                 getWindowManager().getDefaultDisplay().getWidth(),
                 getWindowManager().getDefaultDisplay().getHeight(), 150));
