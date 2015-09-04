@@ -1,6 +1,8 @@
-package fr.joeybronner.turnbyturn.utils;
+package fr.joeybronner.turnbyturn.utilsapi;
 
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -21,14 +23,12 @@ import com.google.android.gms.maps.model.LatLng;
 import android.content.Context;
 import android.util.Log;
 
-public class GMapV2Direction {
-    public final static String MODE_DRIVING = "driving";
-    public final static String MODE_WALKING = "walking";
+public class GoogleMapsDirection {
 
-    public GMapV2Direction() { }
+    public GoogleMapsDirection() { }
 
     public Document getDocument(LatLng start, LatLng end, String mode) {
-        String url = "http://maps.googleapis.com/maps/api/directions/xml?"
+        String u = "http://maps.googleapis.com/maps/api/directions/xml?"
                 + "origin=" + start.latitude + "," + start.longitude
                 + "&destination=" + end.latitude + "," + end.longitude
                 + "&sensor=false&units=metric&mode=driving";
@@ -36,7 +36,7 @@ public class GMapV2Direction {
         try {
             HttpClient httpClient = new DefaultHttpClient();
             HttpContext localContext = new BasicHttpContext();
-            HttpPost httpPost = new HttpPost(url);
+            HttpPost httpPost = new HttpPost(u);
             HttpResponse response = httpClient.execute(httpPost, localContext);
             InputStream in = response.getEntity().getContent();
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

@@ -10,10 +10,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -23,18 +20,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 
-import android.os.Bundle;
-import android.graphics.Color;
-import android.support.v4.app.FragmentActivity;
-import android.view.Display;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,17 +37,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import fr.joeybronner.turnbyturn.utils.GMapV2Direction;
-import fr.joeybronner.turnbyturn.utils.GetDirectionsAsyncTask;
+import fr.joeybronner.turnbyturn.utilsapi.AsyncTaskDrawDirection;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
 
     GoogleMap mMap;
-    private static final LatLng PARIS = new LatLng(48.856132, 2.352448);
     private int once = 1;
     private LatLngBounds latlngBounds;
     private Button bNavigation;
@@ -98,7 +79,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     }
 
                     protected void onPostExecute(Long result) {
-                        findDirections(startLat, startLng, endLat, endLng, GMapV2Direction.MODE_DRIVING);
+                        findDirections(startLat, startLng, endLat, endLng, "driving");
                     }
                 }
                 new Sess().execute();
@@ -163,13 +144,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void findDirections(double fromPositionDoubleLat, double fromPositionDoubleLong, double toPositionDoubleLat, double toPositionDoubleLong, String mode) {
         Map<String, String> map = new HashMap<String, String>();
-        map.put(GetDirectionsAsyncTask.USER_CURRENT_LAT, String.valueOf(fromPositionDoubleLat));
-        map.put(GetDirectionsAsyncTask.USER_CURRENT_LONG, String.valueOf(fromPositionDoubleLong));
-        map.put(GetDirectionsAsyncTask.DESTINATION_LAT, String.valueOf(toPositionDoubleLat));
-        map.put(GetDirectionsAsyncTask.DESTINATION_LONG, String.valueOf(toPositionDoubleLong));
-        map.put(GetDirectionsAsyncTask.DIRECTIONS_MODE, mode);
+        map.put(AsyncTaskDrawDirection.USER_CURRENT_LAT, String.valueOf(fromPositionDoubleLat));
+        map.put(AsyncTaskDrawDirection.USER_CURRENT_LONG, String.valueOf(fromPositionDoubleLong));
+        map.put(AsyncTaskDrawDirection.DESTINATION_LAT, String.valueOf(toPositionDoubleLat));
+        map.put(AsyncTaskDrawDirection.DESTINATION_LONG, String.valueOf(toPositionDoubleLong));
+        map.put(AsyncTaskDrawDirection.DIRECTIONS_MODE, mode);
 
-        GetDirectionsAsyncTask asyncTask = new GetDirectionsAsyncTask(this);
+        AsyncTaskDrawDirection asyncTask = new AsyncTaskDrawDirection(this);
         asyncTask.execute(map);
     }
 
